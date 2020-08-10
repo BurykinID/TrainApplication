@@ -27,6 +27,8 @@ import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.shared.Registration;
 
 import java.time.*;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class TrainForm extends FormLayout {
@@ -61,7 +63,6 @@ public class TrainForm extends FormLayout {
      * These block contains date Train*/
     DatePicker date = new DatePicker("День тренировки");
     // end date's block
-
     /*block of buttons
      * These block contains button for save, delete and close Train*/
     Button save = new Button("Сохранить");
@@ -75,7 +76,38 @@ public class TrainForm extends FormLayout {
 
         binder.forField(date)
                 .withNullRepresentation(LocalDate.now())
-                .withConverter(new LocalDateToDateConverter())
+                .withConverter(new Converter<LocalDate, Date>() {
+                    @Override
+                    public Result<Date> convertToModel (LocalDate localDate, ValueContext valueContext) {
+
+                        if (localDate == null) {
+                            Calendar calendar = Calendar.getInstance();
+                            return Result.ok(calendar.getTime());
+                        }
+                        else {
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.clear();
+                            calendar.set(localDate.getYear(), localDate.getMonthValue()-1, localDate.getDayOfMonth(), 0, 0, 0);
+                            return Result.ok(calendar.getTime());
+                        }
+
+                    }
+
+                    @Override
+                    public LocalDate convertToPresentation (Date date, ValueContext valueContext) {
+
+                        if (date == null) {
+                            Date val = new Date();
+                            LocalDate localDate = val.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            return localDate;
+                        }
+                        else {
+
+                            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        }
+
+                    }
+                })
                 .bind(Train::getDate,
                 Train::setDate);
 
@@ -369,13 +401,13 @@ public class TrainForm extends FormLayout {
         }
     }
 
-    public class SaveEvent extends TrainFormEvent {
+    public static class SaveEvent extends TrainFormEvent {
         SaveEvent(TrainForm source, Train train) {
             super(source, train);
         }
     }
 
-    public class DeleteEvent extends TrainFormEvent {
+    public static class DeleteEvent extends TrainFormEvent {
         DeleteEvent(TrainForm source, Train train) {
             super(source, train);
         }
@@ -386,7 +418,6 @@ public class TrainForm extends FormLayout {
             super(source, null);
         }
     }
-
 
     public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType,
                                                                   ComponentEventListener<T> listener) {

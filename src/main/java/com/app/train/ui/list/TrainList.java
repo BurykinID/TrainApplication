@@ -135,7 +135,6 @@ public class TrainList extends VerticalLayout {
             closeEditor();
         }
         else {
-
             trainForm.setTrain(train);
             trainForm.setVisible(true);
         }
@@ -149,7 +148,7 @@ public class TrainList extends VerticalLayout {
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
 
-        Button addContactButton = new Button("Add contact", click -> addTrain());
+        Button addContactButton = new Button("Add Train", click -> addTrain());
 
         HorizontalLayout horizontalLayout = new HorizontalLayout(filterText, addContactButton);
         horizontalLayout.addClassName("toolbar");

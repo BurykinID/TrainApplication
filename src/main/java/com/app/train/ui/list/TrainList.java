@@ -18,7 +18,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 
 import java.time.LocalTime;
-import java.util.Date;
 
 
 @Route(value = "", layout = MainLayout.class)
@@ -27,7 +26,6 @@ public class TrainList extends VerticalLayout {
     private final TrainService trainService;
     private final ExerciseService exerciseService;
     private final UserService userService;
-    private final LevelOfStressService levelOfStressService;
 
     private final TrainForm trainForm;
 
@@ -35,10 +33,10 @@ public class TrainList extends VerticalLayout {
     TextField filterText = new TextField();
 
     public TrainList (TrainService trainService, ExerciseService exerciseService, UserService userService, LevelOfStressService levelOfStressService) {
+
         this.trainService = trainService;
         this.exerciseService = exerciseService;
         this.userService = userService;
-        this.levelOfStressService = levelOfStressService;
 
         addClassName("train-view");
         setSizeFull();
@@ -83,21 +81,18 @@ public class TrainList extends VerticalLayout {
             Exercise exercise = exerciseService.findById(train.getExercise());
             return exercise == null ? new Exercise() : exercise.getName();
         }).setHeader("exercise");
-        trainGrid.addColumn(train -> {
-            double timeRecreation = train.getTimeRecreation();
-            return timeRecreation;
-        }).setHeader("timeRecreation");
+        trainGrid.addColumn(Train::getTimeRecreation).setHeader("timeRecreation");
         trainGrid.addColumn(train -> {
             String pulseStart = String.valueOf(train.getPulseStart());
-            return pulseStart.isEmpty() || pulseStart == null ? "-" : pulseStart;
+            return pulseStart.isEmpty() ? "-" : pulseStart;
         }).setHeader("pulseStart");
         trainGrid.addColumn(train -> {
             String pulseFinish = String.valueOf(train.getPulseFinish());
-            return pulseFinish.isEmpty() || pulseFinish == null ? "-" : pulseFinish;
+            return pulseFinish.isEmpty() ? "-" : pulseFinish;
         }).setHeader("pulseFinish");
         trainGrid.addColumn(train -> {
             String pulseMax = String.valueOf(train.getPulseMax());
-            return pulseMax.isEmpty() || pulseMax == null ? "-" : pulseMax;
+            return pulseMax.isEmpty() ? "-" : pulseMax;
         }).setHeader("pulseMax");
         trainGrid.addColumn(train -> {
             LocalTime timeStart = train.getTimeStart();
@@ -109,11 +104,11 @@ public class TrainList extends VerticalLayout {
         }).setHeader("timeFinish");
         trainGrid.addColumn(train -> {
             String powerReserve = train.getPowerReserve();
-            return powerReserve.isEmpty() || powerReserve == null ? "-" : powerReserve;
+            return powerReserve.isEmpty() ? "-" : powerReserve;
         }).setHeader("timeRecreation");
         trainGrid.addColumn(train -> {
             String levelOfStress = train.getLevelOfStress().getName();
-            return levelOfStress.isEmpty() || levelOfStress == null ? "-" : levelOfStress;
+            return levelOfStress.isEmpty() ? "-" : levelOfStress;
         }).setHeader("levelOfStress");
 
         trainGrid.getColumns().forEach(columns -> columns.setAutoWidth(true));

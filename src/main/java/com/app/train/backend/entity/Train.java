@@ -1,10 +1,7 @@
 package com.app.train.backend.entity;
 
 import com.sun.istack.NotNull;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,10 +19,12 @@ public class Train extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "exercise_id")
+    @ToString.Exclude
     private Exercise exercise;
 
     @ManyToOne
     @JoinColumn(name = "stress_id")
+    @ToString.Exclude
     private LevelOfStress levelOfStress;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -9,14 +9,14 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserService (UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public User findUserByName(String username) {
-        if (username.isEmpty() || username == null) {
+        if (username.isEmpty()) {
             return new User();
         }
         return userRepository.findByUsername(username);
@@ -32,9 +32,7 @@ public class UserService {
             return new User();
         }
 
-        User resUser = userRepository.findById(user.getId()).orElse(new User());
-
-        return resUser;
+        return userRepository.findById(user.getId()).orElse(new User());
 
     }
 

@@ -9,14 +9,14 @@ import java.util.List;
 @Service
 public class LevelOfStressService {
 
-    private StressLevelRepository stressLevelRepository;
+    private final StressLevelRepository stressLevelRepository;
 
     public LevelOfStressService (StressLevelRepository stressLevelRepository) {
         this.stressLevelRepository = stressLevelRepository;
     }
 
     public LevelOfStress getStressLevel(String stressLevelName) {
-        if (stressLevelName.isEmpty() || stressLevelName == null) {
+        if (stressLevelName.isEmpty()) {
             return new LevelOfStress();
         }
         return stressLevelRepository.findByName(stressLevelName);

@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 public class TrainService {
 
     private static final Logger LOGGER = Logger.getLogger(TrainService.class.getName());
-    private TrainRepository trainRepository;
-    private ExerciseRepository exerciseRepository;
+    private final TrainRepository trainRepository;
+    private final ExerciseRepository exerciseRepository;
 
     public TrainService (TrainRepository trainRepository, ExerciseRepository exerciseRepository) {
         this.trainRepository = trainRepository;
@@ -26,7 +26,7 @@ public class TrainService {
     }
 
     public List<Train> findAll(String filter) {
-        if (filter.isEmpty() || filter == null) {
+        if (filter.isEmpty()) {
             return trainRepository.findAll();
         }
 
@@ -42,7 +42,6 @@ public class TrainService {
             trainRepository.save(train);
         else {
             LOGGER.log(Level.SEVERE, "Train is null.");
-            return;
         }
     }
 

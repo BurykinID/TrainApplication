@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 @Service
 public class ExerciseService {
 
-    private ExerciseRepository exerciseRepository;
+    private final ExerciseRepository exerciseRepository;
 
     Logger LOGGER = Logger.getLogger(ExerciseService.class.getName());
 
@@ -24,14 +24,12 @@ public class ExerciseService {
     }
 
     public Exercise findByName(String exerciseName) {
-        if (exerciseName.isEmpty() || exerciseName == null) {
+        if (exerciseName.isEmpty()) {
             LOGGER.log(Level.SEVERE, "Exercise Name is empty");
             return null;
         }
 
-        Exercise result = exerciseRepository.findByName(exerciseName);
-
-        return result;
+        return exerciseRepository.findByName(exerciseName);
     }
 
     public Exercise findById (Exercise value) {
@@ -40,8 +38,6 @@ public class ExerciseService {
             return new Exercise();
         }
 
-        Exercise exercise = exerciseRepository.findById(value.getId()).orElse(new Exercise());
-
-        return exercise;
+        return exerciseRepository.findById(value.getId()).orElse(new Exercise());
     }
 }

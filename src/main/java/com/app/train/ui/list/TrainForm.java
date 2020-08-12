@@ -23,10 +23,12 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
-import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.shared.Registration;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -54,8 +56,7 @@ public class TrainForm extends FormLayout {
      * These block contains info about */
     TextField powerReserve = new TextField("Резерв");
     /* block of time
-        These block contains time value. Time start, Time Finish
-     */
+        These block contains time value. Time start, Time Finish*/
     TimePicker timeStart = new TimePicker("Время начала выполнения упражнения");
     TimePicker timeFinish = new TimePicker("Время окончания выполнения упражнения");
     // end time's block
@@ -80,16 +81,12 @@ public class TrainForm extends FormLayout {
                     @Override
                     public Result<Date> convertToModel (LocalDate localDate, ValueContext valueContext) {
 
-                        if (localDate == null) {
-                            Calendar calendar = Calendar.getInstance();
-                            return Result.ok(calendar.getTime());
-                        }
-                        else {
-                            Calendar calendar = Calendar.getInstance();
+                        Calendar calendar = Calendar.getInstance();
+                        if (localDate != null) {
                             calendar.clear();
-                            calendar.set(localDate.getYear(), localDate.getMonthValue()-1, localDate.getDayOfMonth(), 0, 0, 0);
-                            return Result.ok(calendar.getTime());
+                            calendar.set(localDate.getYear(), localDate.getMonthValue() - 1, localDate.getDayOfMonth(), 0, 0, 0);
                         }
+                        return Result.ok(calendar.getTime());
 
                     }
 
@@ -98,11 +95,9 @@ public class TrainForm extends FormLayout {
 
                         if (date == null) {
                             Date val = new Date();
-                            LocalDate localDate = val.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                            return localDate;
+                            return val.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                         }
                         else {
-
                             return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                         }
 
@@ -169,7 +164,7 @@ public class TrainForm extends FormLayout {
                             value = 0;
                         }
                         else {
-                            value = aDouble.intValue();;
+                            value = aDouble.intValue();
                         }
 
                         return Result.ok(value);
@@ -302,6 +297,18 @@ public class TrainForm extends FormLayout {
                         Train::setPulseMax);
 
         binder.bindInstanceFields(this);
+
+        binder.forField(exercise)
+                .bind(Train::getExercise,
+                        Train::setExercise);
+
+        binder.forField(levelOfStress)
+                .bind(Train::getLevelOfStress,
+                        Train::setLevelOfStress);
+
+        binder.forField(idUser)
+                .bind(Train::getIdUser,
+                        Train::setIdUser);
 
         exercise.setItems(exerciseList);
         levelOfStress.setItems(levelOfStressList);

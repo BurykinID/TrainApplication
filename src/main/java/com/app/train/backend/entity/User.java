@@ -1,10 +1,7 @@
 package com.app.train.backend.entity;
 
 import com.sun.istack.NotNull;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -27,6 +24,7 @@ public class User extends AbstractEntity {
     private String password;
 
     @OneToMany(mappedBy = "idUser", fetch = FetchType.EAGER)
+    @ToString.Exclude
     private List<Train> trains;
 
 }

@@ -3,7 +3,6 @@ package com.app.train.ui;
 import com.app.train.ui.list.TrainList;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.router.HighlightConditions;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 
 public class MainLayout extends AppLayout {

@@ -21,6 +21,7 @@ public class User extends AbstractEntity {
 
     @NotNull
     @NotEmpty
+    @ToString.Exclude
     private String password;
 
     @OneToMany(mappedBy = "idUser", fetch = FetchType.EAGER)

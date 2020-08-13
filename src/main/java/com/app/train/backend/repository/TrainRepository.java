@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TrainRepository extends JpaRepository<Train, Long> {
 
-    @Query("select t from Train t where t.exercise.name like :nameOfExercise")
+    @Query("select t from Train t where t.exercise.name like concat('%', :nameOfExercise, '%')")
     List<Train> findByExerciseName (@Param("nameOfExercise") String nameOfExercise);
 
 }

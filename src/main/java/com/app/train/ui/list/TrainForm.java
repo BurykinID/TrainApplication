@@ -75,6 +75,8 @@ public class TrainForm extends FormLayout {
 
     public TrainForm (List<Exercise> exerciseList, List<LevelOfStress> levelOfStressList, List<User> userList) {
 
+        addClassName("train-form");
+
         binder.forField(date)
                 .withNullRepresentation(LocalDate.now())
                 .withConverter(new Converter<LocalDate, Date>() {
@@ -311,13 +313,16 @@ public class TrainForm extends FormLayout {
                         Train::setIdUser);
 
         exercise.setItems(exerciseList);
+        exercise.setItemLabelGenerator(Exercise::getName);
         levelOfStress.setItems(levelOfStressList);
+        levelOfStress.setItemLabelGenerator(LevelOfStress::getName);
         idUser.setItems(userList);
+        idUser.setItemLabelGenerator(User::getUsername);
 
         configureTimePickers();
         configureNumberFields();
 
-        add(new HorizontalLayout(configureForm(),
+        add(new VerticalLayout(configureForm(),
                 createButtonsLayout()));
 
     }

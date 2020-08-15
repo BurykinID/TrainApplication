@@ -12,3 +12,14 @@
   flex : 1;
   padding: var(--lumo-space-m);
 }
+
+/* header */
+
+.header {
+  padding: 0 var(--lumo-space-m);
+}
+
+.header .h5.menu {
+  font-size: 1em;
+  margin: var(--lumo-space-m);
+}

@@ -1,9 +1,10 @@
-package com.app.train.ui.list;
+package com.app.train.ui.mainInfo;
 
 import com.app.train.backend.entity.Exercise;
 import com.app.train.backend.entity.LevelOfStress;
 import com.app.train.backend.entity.Train;
 import com.app.train.backend.entity.User;
+import com.app.train.backend.service.TrainService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -34,6 +35,9 @@ import java.util.Date;
 import java.util.List;
 
 public class TrainForm extends FormLayout {
+
+
+    private final TrainService trainService;
 
     /*block of special value
      * These block contains Exercise and Level of Stress value and User id*/
@@ -69,44 +73,19 @@ public class TrainForm extends FormLayout {
     Button save = new Button("Сохранить");
     Button delete = new Button("Удалить");
     Button close = new Button("Скрыть");
+    Button duplicateExercise = new Button("Дублировать");
+    /*Button duplicatePrevious*/
     // end buttons block
-
     Binder<Train> binder = new BeanValidationBinder<>(Train.class);
 
-    public TrainForm (List<Exercise> exerciseList, List<LevelOfStress> levelOfStressList, List<User> userList) {
+    public TrainForm (List<Exercise> exerciseList, List<LevelOfStress> levelOfStressList, List<User> userList, TrainService trainService) {
+
+        this.trainService = trainService;
 
         addClassName("train-form");
 
         binder.forField(date)
-                .withNullRepresentation(LocalDate.now())
-                .withConverter(new Converter<LocalDate, Date>() {
-                    @Override
-                    public Result<Date> convertToModel (LocalDate localDate, ValueContext valueContext) {
-
-                        Calendar calendar = Calendar.getInstance();
-                        if (localDate != null) {
-                            calendar.clear();
-                            calendar.set(localDate.getYear(), localDate.getMonthValue() - 1, localDate.getDayOfMonth(), 0, 0, 0);
-                        }
-                        return Result.ok(calendar.getTime());
-
-                    }
-
-                    @Override
-                    public LocalDate convertToPresentation (Date date, ValueContext valueContext) {
-
-                        if (date == null) {
-                            Date val = new Date();
-                            return val.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        }
-                        else {
-                            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        }
-
-                    }
-                })
-                .bind(Train::getDate,
-                Train::setDate);
+                .withNullRepresentation(LocalDate.now());
 
         binder.forField(timeStart)
                 .withNullRepresentation(LocalTime.now())
@@ -298,8 +277,6 @@ public class TrainForm extends FormLayout {
                 .bind(Train::getPulseMax,
                         Train::setPulseMax);
 
-        binder.bindInstanceFields(this);
-
         binder.forField(exercise)
                 .bind(Train::getExercise,
                         Train::setExercise);
@@ -311,6 +288,9 @@ public class TrainForm extends FormLayout {
         binder.forField(idUser)
                 .bind(Train::getIdUser,
                         Train::setIdUser);
+
+        binder.bindInstanceFields(this);
+
 
         exercise.setItems(exerciseList);
         exercise.setItemLabelGenerator(Exercise::getName);
@@ -385,13 +365,104 @@ public class TrainForm extends FormLayout {
         close.addClickShortcut(Key.ESCAPE);
 
         save.addClickListener(click -> validateAndSave());
-        //delete.addClickListener(click -> fireEvent(new DeleteEvent(this, binder.getBean())));
         delete.addClickListener(click -> fireEvent(new DeleteEvent(this, binder.getBean())));
         close.addClickListener(click -> fireEvent(new CloseEvent(this)));
+        duplicateExercise.addClickListener(click -> createDuplicate());
 
         binder.addStatusChangeListener(evt -> save.setEnabled(binder.isValid()));
 
-        return new HorizontalLayout(save, delete, close);
+        return new HorizontalLayout(save, duplicateExercise, delete, close);
+    }
+
+    private void createDuplicate () {
+        if (binder.isValid()) {
+            Train train = binder.getBean();
+            train.setId(null);
+            train = getLastTrainValue(train);
+            binder.setBean(train);
+            clearPlaceholderField();
+        }
+    }
+
+    private void clearPlaceholderField () {
+        repeats.clear();
+        weight.clear();
+        timeRecreation.clear();
+        /*pulseStart.clear();
+        pulseFinish.clear();
+        pulseMax.clear();*/
+        levelOfStress.clear();
+    }
+    // this method will setup value where was at the last train in this set and this user in this exercise
+    private Train getLastTrainValue (Train train) {
+
+        /* completed    проставлять дату
+        *  completed    проставлять уровень стресса
+        *  completed    проставлять количество повторов которое было в прошлый раз в этом подходе (P.S. в виде плейсхолдера)
+        *  completed    проставить вес, который был в прошлый раз на этом подходе у этого пользователя (P.S placeholder)*/
+
+        train.setIdUser(idUser.getValue());
+
+        User idUser = train.getIdUser();
+        String nameExercise = train.getExercise().getName();
+
+        Date newDate = new Date();
+
+        date.setValue(newDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+        Calendar today = Calendar.getInstance();
+        today = setCalendar(today, newDate, "start");
+        LocalDate todayLocal = today.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        set.setValue(trainService.findSet(idUser, nameExercise, todayLocal) + 1.0);
+
+        today.add(Calendar.DATE, -1);
+
+        LocalDate yesterday = today.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();;
+
+        int exerciseSet = train.getSet();
+
+        repeats.setPlaceholder(String.valueOf(trainService.findRepeats(idUser, nameExercise, yesterday, exerciseSet)));
+        weight.setPlaceholder(String.valueOf(trainService.findWeight(idUser, nameExercise, yesterday, exerciseSet)));
+        levelOfStress.setPlaceholder(trainService.findLevelOfStress(idUser, nameExercise, yesterday, exerciseSet));
+        timeRecreation.setPlaceholder(String.valueOf(trainService.findTimeRecreation(idUser, nameExercise, yesterday, exerciseSet)));
+
+        train = setClearValueInBinder(train);
+
+        return train;
+    }
+    // this method will setup start and finish day when user did exercises
+    public Calendar setCalendar(Calendar calendar, Date date, String index) {
+
+        calendar.setTime(date);
+
+        if (index.equals("start")) {
+            calendar.set(Calendar.MILLISECOND, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+        }
+
+        else if (index.equals("end")) {
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            calendar.set(Calendar.MILLISECOND, 999);
+        }
+
+        return calendar;
+    }
+
+    public Train setClearValueInBinder (Train train) {
+        train.setSet(set.getValue().intValue());
+        train.setRepeats(0);
+        train.setWeight(0);
+        train.setTimeRecreation(0);
+        train.setPulseStart(0);
+        train.setPulseFinish(0);
+        train.setPulseMax(0);
+        train.setLevelOfStress(null);
+        return train;
     }
 
     private void validateAndSave () {

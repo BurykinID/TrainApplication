@@ -1,10 +1,13 @@
 package com.app.train.backend.service;
 
 import com.app.train.backend.entity.Train;
+import com.app.train.backend.entity.User;
 import com.app.train.backend.repository.ExerciseRepository;
 import com.app.train.backend.repository.TrainRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,11 +17,9 @@ public class TrainService {
 
     private static final Logger LOGGER = Logger.getLogger(TrainService.class.getName());
     private final TrainRepository trainRepository;
-    private final ExerciseRepository exerciseRepository;
 
-    public TrainService (TrainRepository trainRepository, ExerciseRepository exerciseRepository) {
+    public TrainService (TrainRepository trainRepository) {
         this.trainRepository = trainRepository;
-        this.exerciseRepository = exerciseRepository;
     }
 
     public List<Train> findAll() {
@@ -47,6 +48,36 @@ public class TrainService {
 
     public void delete(Train train) {
         trainRepository.delete(train);
+    }
+
+    public Double findSet (User idUser, String nameExercise, LocalDate startDay) {
+
+        return trainRepository.findSet(idUser, nameExercise, startDay).orElse(1.0);
+
+    }
+
+    public Double findRepeats (User idUser, String nameExercise, LocalDate startDay, int set) {
+
+        return trainRepository.findRepeats(idUser, nameExercise, startDay, set).orElse(0.0);
+
+    }
+
+    public Double findWeight (User idUser, String nameExercise, LocalDate startDay, int set) {
+
+        return trainRepository.findWeight(idUser, nameExercise, startDay, set).orElse(0.0);
+
+    }
+
+    public String findLevelOfStress (User idUser, String nameExercise, LocalDate startDay, int exerciseSet) {
+
+        return trainRepository.findLevelOfStress(idUser, nameExercise, startDay, exerciseSet).orElse("");
+
+    }
+
+    public Double findTimeRecreation (User idUser, String nameExercise, LocalDate startDay, int exerciseSet) {
+
+        return trainRepository.findTimeRecreation(idUser, nameExercise, startDay, exerciseSet).orElse(0.0);
+
     }
 
 }

@@ -3,9 +3,7 @@ package com.app.train.backend.entity;
 import com.sun.istack.NotNull;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
@@ -14,7 +12,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Data
-public class Exercise extends AbstractEntity {
+public class Exercise {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @NotNull
     @NotEmpty

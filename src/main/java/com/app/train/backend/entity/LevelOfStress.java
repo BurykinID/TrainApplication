@@ -15,6 +15,10 @@ import java.util.List;
 @Data
 public class LevelOfStress extends AbstractEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @NotNull
     @NotEmpty
     private String name;

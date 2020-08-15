@@ -13,7 +13,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Data
-public class User extends AbstractEntity {
+public class User{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @NotNull
     @NotEmpty
@@ -21,7 +25,6 @@ public class User extends AbstractEntity {
 
     @NotNull
     @NotEmpty
-    @ToString.Exclude
     private String password;
 
     @OneToMany(mappedBy = "idUser", fetch = FetchType.EAGER)

@@ -1,4 +1,4 @@
-package com.app.train.ui.list;
+package com.app.train.ui.mainInfo;
 
 import com.app.train.backend.entity.Exercise;
 import com.app.train.backend.entity.Train;
@@ -18,6 +18,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 
@@ -44,7 +45,7 @@ public class TrainList extends VerticalLayout {
         setSizeFull();
         configureGrid();
 
-        trainForm = new TrainForm(exerciseService.findAll(), levelOfStressService.findAll(), userService.findAll());
+        trainForm = new TrainForm(exerciseService.findAll(), levelOfStressService.findAll(), userService.findAll(), trainService);
         trainForm.addListener(TrainForm.SaveEvent.class, this::saveContact);
         trainForm.addListener(TrainForm.DeleteEvent.class, this::deleteContact);
         trainForm.addListener(TrainForm.CloseEvent.class, e -> closeEditor());
@@ -66,6 +67,7 @@ public class TrainList extends VerticalLayout {
         trainGrid.setSizeFull();
 
         trainGrid.removeColumnByKey("timeRecreation");
+        trainGrid.removeColumnByKey("id");
         trainGrid.removeColumnByKey("pulseStart");
         trainGrid.removeColumnByKey("pulseFinish");
         trainGrid.removeColumnByKey("pulseMax");
@@ -75,7 +77,7 @@ public class TrainList extends VerticalLayout {
         trainGrid.removeColumnByKey("levelOfStress");
         trainGrid.removeColumnByKey("exercise");
         trainGrid.removeColumnByKey("idUser");
-        trainGrid.setColumns("id", "set", "repeats", "weight", "date");
+        trainGrid.setColumns("date", "set", "repeats", "weight");
 
         trainGrid.addColumn(train -> {
             User user = userService.findById(train.getIdUser());
@@ -124,6 +126,7 @@ public class TrainList extends VerticalLayout {
     private void addTrain () {
         trainGrid.asSingleSelect().clear();
         Train train = new Train();
+        train.setDate(LocalDate.now());
         editTrain(train);
     }
 

@@ -3,10 +3,8 @@ package com.app.train.backend.entity;
 import com.sun.istack.NotNull;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -15,7 +13,11 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @Data
-public class Train extends AbstractEntity {
+public class Train {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "exercise_id")
@@ -49,6 +51,6 @@ public class Train extends AbstractEntity {
     private String powerReserve;
 
     @NotNull
-    private Date date;
+    private LocalDate date;
 
 }
